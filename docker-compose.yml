@@ -1,0 +1,48 @@
+# docker-compose.yml
+# Chạy toàn bộ hệ thống: docker-compose up
+# Bao gồm: PostgreSQL + Node.js Smart API Hub
+
+version: '3.8'
+
+services:
+  # === PostgreSQL Database ===
+  db:
+    image: postgres:15-alpine
+    container_name: smart_api_hub_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pg_json_server
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5433:5432'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # === Node.js Application ===
+  app:
+    build: .
+    container_name: smart_api_hub_app
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: pg_json_server
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      PORT: 3000
+      JWT_SECRET: smart-api-hub-secret-key-change-in-production
+      JWT_EXPIRES_IN: 24h
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pg_data:

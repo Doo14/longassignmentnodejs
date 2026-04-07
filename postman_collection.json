@@ -1,0 +1,290 @@
+{
+  "info": {
+    "name": "Smart API Hub",
+    "description": "REST API Platform tự động sinh API từ schema.json",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "adminToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Root",
+          "request": { "method": "GET", "url": "{{baseUrl}}/" }
+        },
+        {
+          "name": "Health Check",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+        },
+        {
+          "name": "Swagger JSON",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api-docs.json" }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"New User\",\n  \"role\": \"user\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register - Invalid (no email)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"password123\",\n  \"name\": \"No Email\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('adminToken', jsonData.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (User)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('token', jsonData.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user1@example.com\",\n  \"password\": \"user123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login - Wrong Password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "CRUD - Posts",
+      "item": [
+        {
+          "name": "GET All Posts",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts" }
+        },
+        {
+          "name": "GET Post by ID",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts/1" }
+        },
+        {
+          "name": "GET Post - Not Found",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts/99999" }
+        },
+        {
+          "name": "POST Create Post (Token)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/posts",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Bài viết mới\",\n  \"content\": \"Nội dung test\",\n  \"author\": \"Tester\",\n  \"views\": 0,\n  \"userId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "POST Create Post - No Auth (401)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/posts",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"No Auth\",\n  \"content\": \"Should fail\",\n  \"author\": \"Hacker\",\n  \"views\": 0,\n  \"userId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "PUT Update Post (Token)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/posts/1",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Title\",\n  \"content\": \"Updated content\",\n  \"author\": \"Updated Author\",\n  \"views\": 999,\n  \"userId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "PATCH Partial Update (Token)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/posts/1",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"views\": 500\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE Post - User (403 Forbidden)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/posts/1",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "DELETE Post - Admin (204)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/posts/3",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Advanced Query",
+      "item": [
+        {
+          "name": "Pagination",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?_page=1&_limit=2" }
+        },
+        {
+          "name": "Sorting (desc)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?_sort=views&_order=desc" }
+        },
+        {
+          "name": "Filter (exact)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?author=Nguyen Van A" }
+        },
+        {
+          "name": "Filter (gte operator)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?views_gte=200" }
+        },
+        {
+          "name": "Filter (like operator)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?title_like=node" }
+        },
+        {
+          "name": "Full-text Search",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?q=typescript" }
+        },
+        {
+          "name": "Select Fields",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?_fields=id,title,views" }
+        }
+      ]
+    },
+    {
+      "name": "Relationships",
+      "item": [
+        {
+          "name": "Expand (parent)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/comments?_expand=post" }
+        },
+        {
+          "name": "Embed (children)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts?_embed=comments" }
+        },
+        {
+          "name": "Nested Route",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts/1/comments" }
+        }
+      ]
+    },
+    {
+      "name": "Error Cases",
+      "item": [
+        {
+          "name": "Resource Not Found (404)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/nonexistent" }
+        },
+        {
+          "name": "Invalid ID (400)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/posts/abc" }
+        },
+        {
+          "name": "POST Invalid Data (400)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/posts",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": 123,\n  \"views\": \"not a number\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "users": {
+    "columns": {
+      "email": { "type": "string", "unique": true },
+      "password": { "type": "string" },
+      "name": { "type": "string" },
+      "role": { "type": "string", "default": "user" },
+      "age": { "type": "number", "nullable": true }
+    },
+    "seed": [
+      { "email": "admin@example.com", "password": "admin123", "name": "Admin", "role": "admin", "age": 30 },
+      { "email": "user1@example.com", "password": "user123", "name": "Nguyen Van A", "role": "user", "age": 25 },
+      { "email": "user2@example.com", "password": "user123", "name": "Tran Van B", "role": "user", "age": 28 }
+    ]
+  },
+  "posts": {
+    "columns": {
+      "title": { "type": "string" },
+      "content": { "type": "string" },
+      "author": { "type": "string" },
+      "views": { "type": "number", "default": 0 },
+      "userId": { "type": "number", "references": "users" }
+    },
+    "seed": [
+      { "title": "Bài viết đầu tiên", "content": "Nội dung bài viết số 1", "author": "Nguyen Van A", "views": 100, "userId": 2 },
+      { "title": "Học Node.js cơ bản", "content": "Node.js là runtime JavaScript phía server", "author": "Tran Van B", "views": 250, "userId": 3 },
+      { "title": "TypeScript cho người mới", "content": "TypeScript giúp code an toàn hơn", "author": "Admin", "views": 180, "userId": 1 }
+    ]
+  },
+  "comments": {
+    "columns": {
+      "body": { "type": "string" },
+      "email": { "type": "string" },
+      "postId": { "type": "number", "references": "posts" }
+    },
+    "seed": [
+      { "body": "Bài viết rất hay!", "email": "user1@example.com", "postId": 1 },
+      { "body": "Cảm ơn tác giả", "email": "user2@example.com", "postId": 1 },
+      { "body": "Rất dễ hiểu", "email": "user1@example.com", "postId": 2 }
+    ]
+  }
+}
