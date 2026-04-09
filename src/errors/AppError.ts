@@ -1,19 +1,4 @@
-// src/errors/AppError.ts
-// Custom error classes cho ứng dụng
-// Mỗi loại lỗi có status code và error type riêng
-// → Error handler sẽ dựa vào đây để trả response chính xác
 
-/**
- * AppError — Base class cho tất cả lỗi tùy chỉnh
- *
- * TẠI SAO CẦN CUSTOM ERROR?
- * - Error mặc định của JS chỉ có message, không có status code
- * - Khi catch(error) → ta không biết nên trả 400 hay 404 hay 500
- * - Custom error giải quyết: mỗi loại lỗi mang sẵn status code
- *
- * VD: throw new NotFoundError('posts', 5);
- *   → Error handler tự biết trả 404 + message "posts với id=5 không tồn tại"
- */
 export class AppError extends Error {
   public readonly statusCode: number;
   public readonly errorType: string;
@@ -41,16 +26,7 @@ export class AppError extends Error {
   }
 }
 
-// ============================================================
-// CÁC LOẠI LỖI CỤ THỂ
-// ============================================================
 
-/**
- * 404 Not Found — Resource hoặc record không tồn tại
- *
- * VD: GET /nonexistent → NotFoundError('nonexistent')
- *     GET /posts/999   → NotFoundError('posts', 999)
- */
 export class NotFoundError extends AppError {
   constructor(resource: string, id?: string | number) {
     const message = id
@@ -60,13 +36,7 @@ export class NotFoundError extends AppError {
   }
 }
 
-/**
- * 400 Bad Request — Dữ liệu đầu vào không hợp lệ
- *
- * VD: POST /posts với body rỗng
- *     GET /posts/abc (ID không phải số)
- *     POST /posts với views="abc" (sai kiểu)
- */
+
 export class ValidationError extends AppError {
   public readonly details?: Array<{ field: string; message: string }>;
 
@@ -79,10 +49,7 @@ export class ValidationError extends AppError {
   }
 }
 
-/**
- * 429 Too Many Requests — Client gửi quá nhiều request
- * Được ném bởi rate limiter middleware
- */
+
 export class RateLimitError extends AppError {
   constructor() {
     super(

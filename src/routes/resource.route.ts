@@ -1,8 +1,5 @@
-// src/routes/resource.route.ts
-// Định nghĩa các route động (dynamic routes) cho resource
-// Buổi 7: Thêm auth middleware — Write cần token, DELETE cần admin
 
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import {
   getAll,
   getById,
@@ -16,33 +13,24 @@ import { authenticate, authorizeAdmin } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// ============================================================
-// BẢNG TỔNG HỢP CÁC ROUTE
-// ============================================================
-// | Method | URL                   | Auth      | Controller        |
-// |--------|-----------------------|-----------|-------------------|
-// | GET    | /:resource            | Public    | getAll            |
-// | GET    | /:resource/:id        | Public    | getById           |
-// | GET    | /:resource/:id/:child | Public    | getNestedChildren |
-// | POST   | /:resource            | Token     | create            |
-// | PUT    | /:resource/:id        | Token     | updateFull        |
-// | PATCH  | /:resource/:id        | Token     | updatePartial     |
-// | DELETE | /:resource/:id        | Admin     | remove            |
-// ============================================================
 
-// === GET routes — Public (không cần auth) ===
-router.get('/:resource', getAll);
-router.get('/:resource/:id', getById);
-router.get('/:resource/:id/:child', getNestedChildren);
+router.get('/:resource', getAll as RequestHandler);
+router.get('/:resource/:id', getById as RequestHandler);
+router.get('/:resource/:id/:child', getNestedChildren as RequestHandler);
 
 // === POST — Cần đăng nhập (Token) ===
-router.post('/:resource', authenticate, create);
+router.post('/:resource', authenticate as RequestHandler, create as RequestHandler);
 
 // === PUT/PATCH — Cần đăng nhập (Token) ===
-router.put('/:resource/:id', authenticate, updateFull);
-router.patch('/:resource/:id', authenticate, updatePartial);
+router.put('/:resource/:id', authenticate as RequestHandler, updateFull as RequestHandler);
+router.patch('/:resource/:id', authenticate as RequestHandler, updatePartial as RequestHandler);
 
 // === DELETE — Chỉ admin mới được xóa ===
-router.delete('/:resource/:id', authenticate, authorizeAdmin, remove);
+router.delete(
+  '/:resource/:id', 
+  authenticate as RequestHandler, 
+  authorizeAdmin as RequestHandler, 
+  remove as RequestHandler
+);
 
 export default router;

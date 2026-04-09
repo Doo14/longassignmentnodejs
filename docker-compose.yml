@@ -1,11 +1,8 @@
-# docker-compose.yml
-# Chạy toàn bộ hệ thống: docker-compose up
-# Bao gồm: PostgreSQL + Node.js Smart API Hub
 
 version: '3.8'
 
 services:
-  # === PostgreSQL Database ===
+
   db:
     image: postgres:15-alpine
     container_name: smart_api_hub_db
@@ -24,13 +21,12 @@ services:
       timeout: 5s
       retries: 5
 
-  # === Node.js Application ===
   app:
     build: .
     container_name: smart_api_hub_app
     restart: unless-stopped
     ports:
-      - '3000:3000'
+      - '8080:3000'
     environment:
       DB_HOST: db
       DB_PORT: 5432

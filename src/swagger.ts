@@ -1,15 +1,11 @@
-// src/swagger.ts
-// Swagger UI — API Documentation tự động
+
 // Truy cập tại: http://localhost:3000/api-docs
 
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { Express } from 'express';
 
-/**
- * Swagger/OpenAPI specification
- * Mô tả toàn bộ API endpoints, parameters, request/response schemas
- */
+
 const swaggerSpec = swaggerJsdoc({
   definition: {
     openapi: '3.0.0',
